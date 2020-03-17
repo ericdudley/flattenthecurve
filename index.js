@@ -17,7 +17,7 @@ function dotStep(dot, delta) {
 
 function setup() {
   var canvas = createCanvas(windowWidth, windowHeight);
-
+  
   // Move the canvas so it’s inside our <div id="sketch-holder">.
   canvas.parent("p5-wrapper");
 
@@ -29,14 +29,29 @@ function setup() {
     dots[i].vel.x = (Math.random() - 0.5);
     dots[i].vel.y = (Math.random() - 0.5);
 
-    if (dots[i].vel.x < 0.7) {
+    if (dots[i].vel.x < 0.99) {
       dots[i].vel.x = 0;
     }
-    if (dots[i].vel.y < 0.7) {
+    if (dots[i].vel.y < 0.99) {
       dots[i].vel.y = 0;
     }
   }
 }
+
+function getRandomIndex() {
+  return Math.floor(dots.length * Math.random());
+  
+}
+
+const STUBBORNESS_TRESHOLD_MS = 1000;
+
+setInterval(() => {
+  const dot = dots[getRandomIndex()]
+  if (!dot.vel.x && !dot.vel.y) {
+    dot.vel.x = Math.random();
+    dot.vel.y = Math.random();
+  }
+}, STUBBORNESS_TRESHOLD_MS);
 
 function draw() {
   background(0, 0, 0);
@@ -70,6 +85,10 @@ function draw() {
         pop();
       }
     }
+  }
+
+  if (mouseIsPressed) {
+    // do something; mouseX mouseY
   }
 }
 

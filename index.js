@@ -15,6 +15,7 @@ function dotStep(dot, delta) {
   dot.vel.y *= acc;
 }
 
+const STUBBORNESS_TRESHOLD_MS = 1000; // a random actor may start moving every second; 
 function setup() {
   var canvas = createCanvas(windowWidth, windowHeight);
   
@@ -25,7 +26,7 @@ function setup() {
     dots.push(new Dot());
     dots[i].pos.x = Math.random() * width;
     dots[i].pos.y = Math.random() * height;
-    dots[i].rad = 15;
+    dots[i].rad = 12;
     dots[i].vel.x = (Math.random() - 0.5);
     dots[i].vel.y = (Math.random() - 0.5);
 
@@ -36,22 +37,27 @@ function setup() {
       dots[i].vel.y = 0;
     }
   }
+
+  setInterval(() => {
+    if (Math.random() < 0.7) return;
+
+    const dot = dots[getRandomIndex()]
+    if (!dot.vel.x && !dot.vel.y) {
+      dot.vel.x = Math.random();
+      dot.vel.y = Math.random();
+    } else {
+      dot.vel.x = 0
+      dot.vel.y = 0
+    }
+
+
+  }, STUBBORNESS_TRESHOLD_MS);
 }
 
 function getRandomIndex() {
   return Math.floor(dots.length * Math.random());
   
 }
-
-const STUBBORNESS_TRESHOLD_MS = 1000;
-
-setInterval(() => {
-  const dot = dots[getRandomIndex()]
-  if (!dot.vel.x && !dot.vel.y) {
-    dot.vel.x = Math.random();
-    dot.vel.y = Math.random();
-  }
-}, STUBBORNESS_TRESHOLD_MS);
 
 function draw() {
   background(0, 0, 0);

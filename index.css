@@ -191,10 +191,10 @@ header {
   background-color: var(--BACKGROUND-COLOR);
   height: 80px;
   width: 100vw;
-  padding: 8px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
 }
 
 main {
@@ -220,20 +220,39 @@ footer {
 }
 
 .logo {
-  height: 64px;
+  height: 48px;
+}
+
+.panel {
+  position: absolute;
+  top: 6px;
+  right: 20px;
+  padding: 16px;
+  display: flex;
+  opacity: 0.6;
+}
+
+.panel:hover {
+  opacity: 1;
 }
 
 #parameters {
-  min-width: 300px;
+  width: 250px;
   background-color: var(--PANE-COLOR);
   border-radius: 4px;
   padding: 10px 12px;
+  margin-right: 8px;
 }
 
 #sliders {
   display: flex;
   flex-direction: column;
   margin: 16px 0;
+}
+
+#chartContainer {
+  height: 200px;
+  width: 400px;
 }
 
 .input {

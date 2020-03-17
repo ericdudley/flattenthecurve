@@ -15,9 +15,10 @@ function dotStep(dot, delta) {
   dot.vel.y *= acc;
 }
 
+const STUBBORNESS_TRESHOLD_MS = 1000; // a random actor may start moving every second; 
 function setup() {
   var canvas = createCanvas(windowWidth, windowHeight);
-
+  
   // Move the canvas so it’s inside our <div id="sketch-holder">.
   canvas.parent("p5-wrapper");
 
@@ -25,10 +26,37 @@ function setup() {
     dots.push(new Dot());
     dots[i].pos.x = Math.random() * width;
     dots[i].pos.y = Math.random() * height;
-    dots[i].rad = 15;
+    dots[i].rad = 12;
     dots[i].vel.x = (Math.random() - 0.5);
     dots[i].vel.y = (Math.random() - 0.5);
+
+    if (dots[i].vel.x < 0.99) {
+      dots[i].vel.x = 0;
+    }
+    if (dots[i].vel.y < 0.99) {
+      dots[i].vel.y = 0;
+    }
   }
+
+  setInterval(() => {
+    if (Math.random() < 0.7) return;
+
+    const dot = dots[getRandomIndex()]
+    if (!dot.vel.x && !dot.vel.y) {
+      dot.vel.x = Math.random();
+      dot.vel.y = Math.random();
+    } else {
+      dot.vel.x = 0
+      dot.vel.y = 0
+    }
+
+
+  }, STUBBORNESS_TRESHOLD_MS);
+}
+
+function getRandomIndex() {
+  return Math.floor(dots.length * Math.random());
+  
 }
 
 function draw() {
@@ -42,7 +70,7 @@ function draw() {
     for (let j = 0; j < dots.length; j++) {
       const other = dots[j];
       const other_modpos = other.modpos;
-      if (dots[i].modpos.dist(other.modpos) < 100 && dots[i].infected) {
+      if (dots[i].modpos.dist(other.modpos) < 50 && dots[i].infected) {
         if (Math.random() > 0.5) {
           if (dots[j].infected  == false) {
               dots[j].vel.x = (Math.random() - 0.5);
@@ -63,6 +91,10 @@ function draw() {
         pop();
       }
     }
+  }
+
+  if (mouseIsPressed) {
+    // do something; mouseX mouseY
   }
 }
 

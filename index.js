@@ -6,6 +6,15 @@ function windowResized() {
   resizeCanvas(rect.width, rect.height);
 }
 
+function dotStep(dot, delta) {
+  var mean_acc = 0.1;
+  var max_vel = 4.0;
+  var curr_vel = Math.sqrt(dot.vel.x ** 2 + dot.vel.y ** 2);
+  var acc = ((max_vel / curr_vel) * delta) + 1;
+  dot.vel.x *= acc;
+  dot.vel.y *= acc;
+}
+
 function setup() {
   var canvas = createCanvas(windowWidth, windowHeight);
 
@@ -16,9 +25,9 @@ function setup() {
     dots.push(new Dot());
     dots[i].pos.x = Math.random() * width;
     dots[i].pos.y = Math.random() * height;
-    dots[i].rad = 15 + Math.random() * 10;
-    dots[i].vel.x = Math.random() * 5;
-    dots[i].vel.y = Math.random() * 5;
+    dots[i].rad = 15;
+    dots[i].vel.x = (Math.random() - 0.5);
+    dots[i].vel.y = (Math.random() - 0.5);
   }
 }
 
@@ -28,13 +37,19 @@ function draw() {
   for (let i = 0; i < dots.length; i++) {
     dots[i].update();
     dots[i].render();
+    dotStep(dots[i], 0.001);
 
     for (let j = 0; j < dots.length; j++) {
       const other = dots[j];
       const other_modpos = other.modpos;
       if (dots[i].modpos.dist(other.modpos) < 100 && dots[i].infected) {
         if (Math.random() > 0.5) {
+          if (dots[j].infected  == false) {
+              dots[j].vel.x = (Math.random() - 0.5);
+              dots[j].vel.y = (Math.random() - 0.5);
+          }
           dots[j].infected = true;
+
         }
 
         push();

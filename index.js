@@ -28,6 +28,13 @@ function setup() {
     dots[i].rad = 15;
     dots[i].vel.x = (Math.random() - 0.5);
     dots[i].vel.y = (Math.random() - 0.5);
+
+    if (dots[i].vel.x < 0.7) {
+      dots[i].vel.x = 0;
+    }
+    if (dots[i].vel.y < 0.7) {
+      dots[i].vel.y = 0;
+    }
   }
 }
 
@@ -42,7 +49,7 @@ function draw() {
     for (let j = 0; j < dots.length; j++) {
       const other = dots[j];
       const other_modpos = other.modpos;
-      if (dots[i].modpos.dist(other.modpos) < 100 && dots[i].infected) {
+      if (dots[i].modpos.dist(other.modpos) < 25 && dots[i].infected) {
         if (Math.random() > 0.5) {
           if (dots[j].infected  == false) {
               dots[j].vel.x = (Math.random() - 0.5);

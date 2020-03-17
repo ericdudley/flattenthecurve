@@ -70,7 +70,7 @@ function draw() {
     for (let j = 0; j < dots.length; j++) {
       const other = dots[j];
       const other_modpos = other.modpos;
-      if (dots[i].modpos.dist(other.modpos) < 25 && dots[i].infected) {
+      if (dots[i].modpos.dist(other.modpos) < 50 && dots[i].infected) {
         if (Math.random() > 0.5) {
           if (dots[j].infected  == false) {
               dots[j].vel.x = (Math.random() - 0.5);

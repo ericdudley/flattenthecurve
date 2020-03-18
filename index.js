@@ -1,4 +1,75 @@
+
+
+let populationChart;
+let timeStepCount = 0;
 const dots = [];
+
+window.onload = () => {
+  const chartCtx = document.getElementById('populationChart').getContext('2d');
+  populationChart = new Chart(chartCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: '# of Sick',
+            data: [],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }, {
+          label: '# of Healthy',
+          data: [],
+          backgroundColor: 'rgba(255, 159, 64, 0.2)',
+          borderColor: 'rgba(255, 159, 64, 1)',
+          borderWidth: 1
+        }, {
+          label: '# of Recovered',
+          data: [],
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }],
+    },
+    options: {
+        responsive: true,
+        scales: {
+            yAxes: [{
+                stacked: true,
+            }]
+        }
+    }
+  });
+}
+
+function updateChart() {
+  let numOfSick = 0;
+  let numOfHealthy = 0;
+  let numOfRecovered = 0;
+
+  for (const dot of dots) {
+    if (dot.isInfected()) {
+      numOfSick += 1;
+    } else if (dot.isHealthy()) {
+      numOfHealthy +=1;
+    } else if (dot.isRecovered()) {
+      numOfRecovered += 1;
+    } else {
+      throw Error('wtf');
+    }
+  }
+
+  populationChart.data.labels.push(timeStepCount++);
+  populationChart.data.datasets[0].data.push(numOfSick);
+  populationChart.data.datasets[1].data.push(numOfHealthy);
+  populationChart.data.datasets[2].data.push(numOfRecovered);
+
+  
+  populationChart.update({
+    duration: 0,
+    lazy: false,
+    easing: 'easeOutBounce'
+  });
+}
 
 function windowResized() {
   const p5Wrapper = document.querySelector("#p5-wrapper");
@@ -55,14 +126,16 @@ function setup() {
       dot.vel.x = 0
       dot.vel.y = 0
     }
-
-
   }, STUBBORNESS_TRESHOLD_MS);
+
+  setInterval(() => { updateChart() }, 200);
 }
 
 function draw() {
   background(0, 0, 0);
   translate(width / 2, height / 2);
+
+  // TODO: optimize this check
   for (let i = 0; i < dots.length; i++) {
     dots[i].update();
     dots[i].render();
@@ -106,7 +179,7 @@ function draw() {
 class Dot { 
 
   static VIRAL_STATE_INFECTED = -1;
-  static VIRAL_STATE_NONE = 0;
+  static VIRAL_STATE_HEALTHY = 0;
   static VIRAL_STATE_RECOVERED = 1;
 
   constructor() {
@@ -115,12 +188,20 @@ class Dot {
     this.rad = 0;
     this.spd = 0;
     this.clr = 0;
-    this.viral_state = probablyTrue(INITIAL_INFECTION_PROB) ? Dot.VIRAL_STATE_INFECTED : Dot.VIRAL_STATE_NONE; // -1 for infected; 0 for uninfected; 1 for recovered
+    this.viral_state = probablyTrue(INITIAL_INFECTION_PROB) ? Dot.VIRAL_STATE_INFECTED : Dot.VIRAL_STATE_HEALTHY;
     this.recovery_countdown = (Math.random() - 0.5) * RECOVER_TICKS_RANGE + RECOVERY_TICKS_SEED;
   }
 
   isInfected() {
     return this.viral_state === Dot.VIRAL_STATE_INFECTED;
+  }
+
+  isRecovered() {
+    return this.viral_state === Dot.VIRAL_STATE_RECOVERED;
+  }
+
+  isHealthy() {
+    return this.viral_state === Dot.VIRAL_STATE_HEALTHY;
   }
 
   update() {
@@ -167,7 +248,7 @@ class Dot {
     push();
     if (this.viral_state === Dot.VIRAL_STATE_INFECTED) {
       fill(255, 0, 0);
-    } else if (this.viral_state === Dot.VIRAL_STATE_NONE) {
+    } else if (this.viral_state === Dot.VIRAL_STATE_HEALTHY) {
       fill(255, 255, 255);
     } else if (this.viral_state === Dot.VIRAL_STATE_RECOVERED) {
       fill(0, 255, 0);

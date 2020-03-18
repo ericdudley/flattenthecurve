@@ -7,7 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
         <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
         <script src="index.js"></script>
     </head>
     <body>
@@ -15,29 +17,32 @@
             <img class="logo" src="logo.png"/>
             <h1>FLATTEN THE CURVE</h1>
         </header>
-
-        <div id="parameters">
-            <h2>PARAMETERS</h2>
-            <div id="sliders">
-                <div class="input">
-                    <span class="label">initial infection</span>
-                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        <div class="panel">
+            <div id="parameters">
+                <h2>PARAMETERS</h2>
+                <div id="sliders">
+                    <div class="input">
+                        <span class="label">initial infection</span>
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </div>
+                    <div class="input">
+                        <span class="label">speed</span>
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </div>
+                    <div class="input">
+                        <span class="label">population size</span>
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </div>
                 </div>
-                <div class="input">
-                    <span class="label">speed</span>
-                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-                </div>
-                <div class="input">
-                    <span class="label">population size</span>
-                    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                <div id="actions">
+                    <button>START</button>
+                    <button>RESET</button>
                 </div>
             </div>
-            <div id="actions">
-                <button>START</button>
-                <button>RESET</button>
+            <div id="chartContainer">
+                <canvas id="populationChart"></canvas>
             </div>
         </div>
-
         <main id="p5-wrapper">
         </main>
 

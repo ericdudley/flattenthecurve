@@ -2,44 +2,17 @@
 
 let populationChart;
 let timeStepCount = 0;
+let isSimulationComplete = false;
+let chartInterval;
 const dots = [];
 
-window.onload = () => {
-  const chartCtx = document.getElementById('populationChart').getContext('2d');
-  populationChart = new Chart(chartCtx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: '# of Sick',
-            data: [],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1
-        }, {
-          label: '# of Healthy',
-          data: [],
-          backgroundColor: 'rgba(255, 159, 64, 0.2)',
-          borderColor: 'rgba(255, 159, 64, 1)',
-          borderWidth: 1
-        }, {
-          label: '# of Recovered',
-          data: [],
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }],
-    },
-    options: {
-        responsive: true,
-        scales: {
-            yAxes: [{
-                stacked: true,
-            }]
-        }
-    }
-  });
-}
+/* Color Theme Swatches in Hex */
+const PINK = '#F27E88';
+const GREEN = '#155902';
+const YELLOW = '#F2CB05';
+const RED = '#BF1717';
+const WHITE = '#EBEBEB';
+const BACKGROUND_COLOR = '#171717';
 
 function updateChart() {
   let numOfSick = 0;
@@ -65,10 +38,15 @@ function updateChart() {
 
   
   populationChart.update({
-    duration: 0,
+    duration: 200,
     lazy: false,
     easing: 'easeOutBounce'
   });
+
+  if (numOfSick === 0) {
+    isSimulationComplete = true;
+    clearInterval(chartInterval);
+  }
 }
 
 function windowResized() {
@@ -85,16 +63,16 @@ function probablyTrue(percentRatio) {
   return Math.random() < percentRatio;
 }
 
-const POPULATION_SIZE = 200;
+const POPULATION_SIZE = 150;
 const CONTAGION_PROXIMITY = 25;
-const STUBBORNESS_TRESHOLD_MS = 1000; // a random actor may start moving every second; 
-const STUBBORNESS_PROB = 0.5;
+
 const GOES_TO_HOSPITAL_PROB = 0.2; // probably want to model this after elderly population;
-const VIRAL_TRANSMISSION_PROB = 0.5;
-const INITIAL_INFECTION_PROB = 0.1;
-const SOCIAL_DISTANCER_PROB = 0.7;
-const RECOVERY_TICKS_SEED = 1000;
-const RECOVER_TICKS_RANGE = 150; // means it could be within -150 to +150 of the seed;
+const VIRAL_TRANSMISSION_PROB = 0.95;
+const INITIAL_INFECTION_PROB = 0.05;
+const SOCIAL_DISTANCER_PROB = 0.001;
+const IMPATIENCE_PROB = 0.0001; // probability that someone decides to move/stop
+const RECOVERY_TICKS_SEED = 700;
+const RECOVER_TICKS_RANGE = 100; // means it could be within -150 to +150 of the seed;
 
 function setup() {
   var canvas = createCanvas(windowWidth, windowHeight);
@@ -115,24 +93,40 @@ function setup() {
     }
   }
 
-  setInterval(() => {
-    if (probablyTrue(STUBBORNESS_PROB)) return;
-
-    const dot = dots[getRandomIndex()]
-    if (!dot.vel.x && !dot.vel.y) {
-      dot.vel.x = Math.random();
-      dot.vel.y = Math.random();
-    } else {
-      dot.vel.x = 0
-      dot.vel.y = 0
+  const chartCtx = document.getElementById('populationChart').getContext('2d');
+  populationChart = new Chart(chartCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: '# of Sick',
+            data: [],
+            backgroundColor: PINK,
+        }, {
+          label: '# of Healthy',
+          data: [],
+          backgroundColor: WHITE,
+        }, {
+          label: '# of Recovered',
+          data: [],
+          backgroundColor: GREEN,
+        }],
+    },
+    options: {
+        responsive: true,
+        scales: {
+            yAxes: [{
+                stacked: true,
+            }]
+        }
     }
-  }, STUBBORNESS_TRESHOLD_MS);
+  });
 
-  setInterval(() => { updateChart() }, 200);
+  chartInterval = setInterval(updateChart, 250);
 }
 
 function draw() {
-  background(0, 0, 0);
+  background(BACKGROUND_COLOR);
   translate(width / 2, height / 2);
 
   // TODO: optimize this check
@@ -159,7 +153,7 @@ function draw() {
         }
 
         push();
-        stroke(0, 255, 0);
+        stroke(WHITE);
         line(
           dots[i].modpos.x,
           dots[i].modpos.y,
@@ -190,6 +184,7 @@ class Dot {
     this.clr = 0;
     this.viral_state = probablyTrue(INITIAL_INFECTION_PROB) ? Dot.VIRAL_STATE_INFECTED : Dot.VIRAL_STATE_HEALTHY;
     this.recovery_countdown = (Math.random() - 0.5) * RECOVER_TICKS_RANGE + RECOVERY_TICKS_SEED;
+    // this.patience = (Math.random() - 0.5) * PATIENCE_TICKS_RANGE + PATIENCE_TICKS_SEED;
   }
 
   isInfected() {
@@ -220,6 +215,16 @@ class Dot {
         this.viral_state = Dot.VIRAL_STATE_RECOVERED
       }
     }
+
+    if (probablyTrue(IMPATIENCE_PROB)) {
+      if (!this.vel.x && !this.vel.y && !this.isInfected()) {
+        this.vel.x = (Math.random() - 0.5) * 2.5;
+        this.vel.y = (Math.random() - 0.5) * 2.5;
+      } else {
+        this.vel.x = 0
+        this.vel.y = 0
+      }
+    }
   }
 
   get modpos() {
@@ -247,11 +252,11 @@ class Dot {
   render() {
     push();
     if (this.viral_state === Dot.VIRAL_STATE_INFECTED) {
-      fill(255, 0, 0);
+      fill(PINK);
     } else if (this.viral_state === Dot.VIRAL_STATE_HEALTHY) {
-      fill(255, 255, 255);
+      fill(WHITE);
     } else if (this.viral_state === Dot.VIRAL_STATE_RECOVERED) {
-      fill(0, 255, 0);
+      fill(GREEN);
     }
     ellipse(this.modpos.x, this.modpos.y, this.rad, this.rad);
     pop();

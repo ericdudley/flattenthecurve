@@ -4,9 +4,9 @@
 }
 
 :root {
-  --BACKGROUND-COLOR: #000000;
+  --BACKGROUND-COLOR: #171717;
   --PANE-COLOR: #111111;
-  --PRIMARY-COLOR: #00ff00;
+  --PRIMARY-COLOR: #155902;
 }
 
 @charset "utf-8";
@@ -251,8 +251,8 @@ footer {
 }
 
 #chartContainer {
-  height: 200px;
-  width: 400px;
+  height: 240px;
+  width: 480px;
 }
 
 .input {

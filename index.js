@@ -63,7 +63,7 @@ window.onload = () => {
   const toggleStateButton = document.getElementById("toggle-state-button");
   toggleStateButton.addEventListener("click", () => {
     state = state === STATE_PAUSE ? STATE_PLAY : STATE_PAUSE;
-    toggleStateButton.innerText = state === STATE_PAUSE ? "Start" : "Stop";
+    toggleStateButton.innerText = state === STATE_PAUSE ? "START" : "STOP";
   });
 
   const resetButton = document.getElementById("reset-button");
